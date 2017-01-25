@@ -2,10 +2,15 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { PeopleListComponent } from './people-list.component';
 import { PersonDetailsComponent } from './person-details.component';
+import { TemperatureComponent } from './temperature.component';
 
 // Route config let's you map routes to components
 const routes: Routes = [
   // map '/persons' to the people list component
+  {
+    path: 'termperature',
+    component: TemperatureComponent,
+  },
   {
     path: 'persons',
     component: PeopleListComponent,

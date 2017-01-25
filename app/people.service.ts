@@ -2,12 +2,21 @@ import { Injectable } from '@angular/core';
 import { Http, Response, Headers} from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { Person } from './person';
+import { Temperature} from './temperature';
 
 @Injectable()
 export class PeopleService{
   private baseUrl: string = 'http://swapi.co/api';
+  //private baseUrl: string = 'https://yf7odpkj0k.execute-api.us-east-1.amazonaws.com'
 
   constructor(private http : Http){
+  }
+
+  getTemp(): Observable<Temperature>{
+    let temperature$ = this.http
+      .get(`http://labhvac.s3-website-us-east-1.amazonaws.com/temperature.json`, {headers: this.getHeaders()})
+      .map(mapTemperature);
+    return temperature$;
   }
 
   getAll(): Observable<Person[]>{
@@ -48,6 +57,16 @@ function mapPersons(response:Response): Person[]{
    return response.json().results.map(toPerson)
 }
 
+function mapTemperatures(response:Response): Temperature[]{
+  // uncomment to simulate error:
+  // throw new Error('ups! Force choke!');
+
+  // The response of the API has a results
+  // property with the actual results
+  return response.json().results.map(toTemperature)
+}
+
+
 function toPerson(r:any): Person{
   let person = <Person>({
     id: extractId(r),
@@ -58,6 +77,16 @@ function toPerson(r:any): Person{
   });
   console.log('Parsed person:', person);
   return person;
+}
+
+function toTemperature(r:any): Temperature{
+  let temperature = <Temperature>({
+    celsius: r.celsius,
+    fahrenheit: r.fahrenheit,
+    dateTime: r.dateTime,
+  });
+  console.log('Parsed Temperature:', temperature);
+  return temperature;
 }
 
 // to avoid breaking the rest of our app
@@ -71,6 +100,13 @@ function mapPerson(response:Response): Person{
   // toPerson looks just like in the previous example
   return toPerson(response.json());
 }
+
+
+function mapTemperature(response:Response): Temperature{
+  // toPerson looks just like in the previous example
+  return toTemperature(response.json());
+}
+
 
 // this could also be a private method of the component class
 function handleError (error: any) {
